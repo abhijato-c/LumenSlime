@@ -1,63 +1,100 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
+using System.Collections.Generic;
 
 public class SlimeController : MonoBehaviour {
     [Header("Movement")]
-    public float moveSpeed = 8f;
-    public float jumpForce = 12f;
-    public float wallSlideSpeed = 2f;
+    public float MoveForce;
+    public float JumpForce;
+    public float MaxSpeed;
+    public float Friction;
 
     [Header("Physics")]
-    public Transform groundCheck;
-    public Transform wallCheck;
-    public LayerMask groundLayer;
+    public Transform GroundCheck;
+    public LayerMask GroundLayer;
+
+    [Header("Squish")]
+    public float SquishForce;
+    public float Elasticity;
+    public int SmoothingSamples;
 
     private Rigidbody2D rb;
-    private float horizontalInput;
-    private bool isGrounded;
-    private bool isWalled;
-    private bool isWallClinging;
+    private bool Grounded;
+    private float inputX = 0f;
+    private bool jumpRequested = false;
+    private Vector2 BaseScale;
+
+    private Queue<Vector2> AccelHist = new Queue<Vector2>();
+    private Vector2 PrevVel;
+
+    private bool RightInput => Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed;
+    private bool LeftInput => Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed;
+    private bool JumpInput => Keyboard.current.wKey.wasPressedThisFrame || 
+                              Keyboard.current.spaceKey.wasPressedThisFrame || 
+                              Keyboard.current.upArrowKey.wasPressedThisFrame;
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
+        BaseScale = transform.localScale;
     }
 
     void Update() {
-        horizontalInput = Input.GetAxisRaw("Horizontal");
+        if (Keyboard.current == null) return;
 
-        if (Input.GetButtonDown("Jump") && isGrounded) {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpForce);
-        }
+        inputX = 0f;
+        if (RightInput) inputX = -1f;
+        if (LeftInput) inputX = 1f;
 
-        // Wall Jump logic triggers here
-        if (Input.GetButtonDown("Jump") && isWallClinging)
-        {
-            // Launch away from the wall
-            rb.linearVelocity = new Vector2(-horizontalInput * moveSpeed, jumpForce);
+        if (JumpInput) {
+            jumpRequested = true;
         }
     }
 
-    void FixedUpdate()
-    {
-        // 2. Apply Horizontal Movement safely
-        if (!isWallClinging)
-        {
-            rb.linearVelocity = new Vector2(horizontalInput * moveSpeed, rb.linearVelocity.y);
+    void FixedUpdate() {
+        Grounded = Physics2D.OverlapCircle(GroundCheck.position, 0.2f, GroundLayer);
+        rb.AddForce(new Vector2(inputX * MoveForce, 0f), ForceMode2D.Force);
+
+        if (Mathf.Abs(rb.linearVelocityX) > MaxSpeed) {
+            rb.linearVelocity = new Vector2(Mathf.Sign(rb.linearVelocityX) * MaxSpeed, rb.linearVelocityY);
         }
 
-        // 3. Environmental Checks using small invisible overlap circles
-        isGrounded = Physics2D.OverlapCircle(groundCheck.position, 0.2f, groundLayer);
-        isWalled = Physics2D.OverlapCircle(wallCheck.position, 0.2f, groundLayer);
+        if (Grounded && inputX == 0) {
+            rb.linearVelocityX = Mathf.Lerp(rb.linearVelocityX, 0, Time.fixedDeltaTime * Friction);
+        }
 
-        // 4. Wall Cling Logic
-        if (isWalled && !isGrounded && horizontalInput != 0)
-        {
-            isWallClinging = true;
-            // Slow down his descent to simulate "sticky slime friction"
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, Mathf.Clamp(rb.linearVelocity.y, -wallSlideSpeed, float.MaxValue));
+        if (jumpRequested) {
+            if (Grounded) {
+                rb.linearVelocityY = 0f; 
+                rb.AddForce(new Vector2(0f, JumpForce), ForceMode2D.Impulse);
+            }
+            jumpRequested = false;
         }
-        else
-        {
-            isWallClinging = false;
+
+        Vector2 accel = (rb.linearVelocity - PrevVel) / Time.fixedDeltaTime;
+        PrevVel = rb.linearVelocity;
+
+        AccelHist.Enqueue(accel);
+        if (AccelHist.Count > SmoothingSamples)
+            AccelHist.Dequeue();
+
+        ComputeSquish();
+    }
+
+    void ComputeSquish() {
+        Vector2 sum = Vector2.zero;
+        foreach (Vector2 a in AccelHist){
+            sum += a;
         }
+        sum /= AccelHist.Count;
+
+        float stretchX = 1f + (Mathf.Abs(sum.x) * SquishForce);
+        float stretchY = 1f + (Mathf.Abs(sum.y) * SquishForce);
+
+        Vector2 targetScale = new Vector2(
+            BaseScale.x * (stretchX / stretchY), 
+            BaseScale.y * (stretchY / stretchX)
+        );
+
+        transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime * Elasticity);
     }
 }
