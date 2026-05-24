@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 
 public class SlimeController : MonoBehaviour {
     [Header("Movement")]
@@ -49,6 +50,7 @@ public class SlimeController : MonoBehaviour {
         BaseCol = col.size;
         AccelHist = new Queue<Vector2>(Enumerable.Repeat(Vector2.zero, SmoothingSamples));
         if (PlayerPrefs.HasKey("CheckpointIndex")) {
+            PlayerPrefs.SetFloat("CheckpointIndex", 0f);
             CpIndex = PlayerPrefs.GetInt("CheckpointIndex");
             LatestCheckpoint = GameObject.Find($"Checkpoint-{CpIndex}");
             MoveToCheckpoint();
@@ -125,15 +127,31 @@ public class SlimeController : MonoBehaviour {
             if (ind > CpIndex) {
                 CpIndex = ind;
                 PlayerPrefs.SetInt("CheckpointIndex", CpIndex);
-                Debug.Log($"Checkpoint {CpIndex} reached");
+                MoveToCheckpoint();
             }
+        }
+        else if (other.CompareTag("ManaOrb")) {
+            other.gameObject.SetActive(false);
         }
     }
 
-    private void MoveToCheckpoint() {
+    public void MoveToCheckpoint() {
         if (LatestCheckpoint != null) {
             transform.position = LatestCheckpoint.transform.position + Vector3.up * 6;
-            rb.linearVelocity = Vector2.zero;
         }
+        else {
+            transform.position = new Vector3(0, 0, 0);
+        }
+        rb.linearVelocity = Vector2.zero;
+
+        Transform Folder = GameObject.Find($"LvOrbs-{CpIndex}").transform;
+        if (Folder == null) return;
+        foreach (GameObject child in Folder) {
+            child.SetActive(true);
+        }
+    }
+
+    public void Quit(){
+        Application.Quit();
     }
 }
