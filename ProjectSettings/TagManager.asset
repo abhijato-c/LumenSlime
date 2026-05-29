@@ -5,6 +5,7 @@ TagManager:
   serializedVersion: 3
   tags:
   - ManaOrb
+  - Kill
   layers:
   - Default
   - TransparentFX

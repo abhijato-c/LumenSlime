@@ -2,7 +2,8 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
+using UnityEngine.UI;
+using System.Collections;
 
 public class SlimeController : MonoBehaviour {
     [Header("Movement")]
@@ -21,8 +22,13 @@ public class SlimeController : MonoBehaviour {
     public float Elasticity;
     public int SmoothingSamples;
 
+    [Header("Misc")]
+    public GameObject EnergyFill;
+    public int ColorLerpDuration;
+
     private Rigidbody2D rb;
     private BoxCollider2D col;
+    private SpriteRenderer sr;
     private bool Grounded;
     private float inputX = 0f;
     private bool Jumping = false;
@@ -30,6 +36,7 @@ public class SlimeController : MonoBehaviour {
     private Vector2 BaseScale;
     private Vector2 BaseCol;
     private GameObject LatestCheckpoint;
+    private float Energy = 0f;
     private int CpIndex = 0;
 
     private Queue<Vector2> AccelHist;
@@ -37,24 +44,26 @@ public class SlimeController : MonoBehaviour {
 
     private bool RightInput => Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed;
     private bool LeftInput => Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed;
-    private bool UpInput => Keyboard.current.wKey.wasPressedThisFrame || 
-                              Keyboard.current.spaceKey.wasPressedThisFrame || 
-                              Keyboard.current.upArrowKey.wasPressedThisFrame;
-    private bool DownInput => Keyboard.current.sKey.wasPressedThisFrame || 
-                              Keyboard.current.downArrowKey.wasPressedThisFrame;
+    private bool UpInput => Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame;
+    private bool DownInput => Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame;
+
+    private int AnimatingColor = 0;
 
     void Start() {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<BoxCollider2D>();
+        sr = GetComponent<SpriteRenderer>();
+
         BaseScale = transform.localScale;
         BaseCol = col.size;
         AccelHist = new Queue<Vector2>(Enumerable.Repeat(Vector2.zero, SmoothingSamples));
+        PlayerPrefs.SetInt("CheckpointIndex", 1);
         if (PlayerPrefs.HasKey("CheckpointIndex")) {
-            PlayerPrefs.SetFloat("CheckpointIndex", 0f);
             CpIndex = PlayerPrefs.GetInt("CheckpointIndex");
             LatestCheckpoint = GameObject.Find($"Checkpoint-{CpIndex}");
             MoveToCheckpoint();
         }
+        ChangeEnergy(60f);
     }
 
     void Update() {
@@ -133,6 +142,10 @@ public class SlimeController : MonoBehaviour {
         else if (other.CompareTag("ManaOrb")) {
             other.gameObject.SetActive(false);
         }
+        else if (other.CompareTag("Kill")) {
+            StartCoroutine(AnimateColor());
+            MoveToCheckpoint();
+        }
     }
 
     public void MoveToCheckpoint() {
@@ -144,12 +157,42 @@ public class SlimeController : MonoBehaviour {
         }
         rb.linearVelocity = Vector2.zero;
 
-        Transform Folder = GameObject.Find($"LvOrbs-{CpIndex}").transform;
+        GameObject Folder = GameObject.Find($"LvOrbs-{CpIndex}");
         if (Folder == null) return;
-        foreach (GameObject child in Folder) {
-            child.SetActive(true);
+        for (int i = 0; i < Folder.transform.childCount; i++) {
+            Folder.transform.GetChild(i).gameObject.SetActive(true);
         }
     }
+
+    public void ChangeEnergy(float amount) {
+        Energy = Mathf.Clamp(Energy + amount, 0f, 100f);
+        float Mheight  = EnergyFill.GetComponentInParent<RectTransform>().sizeDelta.y;
+        EnergyFill.GetComponent<RectTransform>().sizeDelta = new Vector2(
+            EnergyFill.GetComponent<RectTransform>().sizeDelta.x, 
+            Energy / 100f * Mheight
+        );
+        EnergyFill.GetComponent<RectTransform>().anchoredPosition = new Vector2(
+            0f, 
+            Energy / 100f * Mheight / 2f
+        );
+        EnergyFill.GetComponent<Image>().color = Color.Lerp(Color.red, Color.green, Energy / 100f);
+    }
+
+    IEnumerator AnimateColor() {
+        float elapsed = 0f;
+
+        while (elapsed < ColorLerpDuration / 2f) {
+            elapsed += Time.deltaTime; 
+            sr.color = Color.Lerp(Color.white, Color.red, elapsed / ColorLerpDuration);
+            yield return null;
+        }
+        while (elapsed < ColorLerpDuration / 2f) {
+            elapsed += Time.deltaTime; 
+            sr.color = Color.Lerp(Color.red, Color.white, elapsed / ColorLerpDuration);
+            yield return null;
+        }
+    }
+
 
     public void Quit(){
         Application.Quit();
