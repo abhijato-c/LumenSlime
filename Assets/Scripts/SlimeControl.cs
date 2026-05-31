@@ -12,6 +12,7 @@ public class SlimeController : MonoBehaviour {
     public float DownForce;
     public float MaxSpeed;
     public float Friction;
+    public float PadForce;
 
     [Header("Physics")]
     public Transform GroundCheck;
@@ -24,7 +25,9 @@ public class SlimeController : MonoBehaviour {
 
     [Header("Misc")]
     public GameObject EnergyFill;
-    public int ColorLerpDuration;
+    public float ColorLerpDuration;
+    public InnerParallax ParallaxScript;
+    public int cp = 1;
 
     private Rigidbody2D rb;
     private BoxCollider2D col;
@@ -35,7 +38,6 @@ public class SlimeController : MonoBehaviour {
     private bool Downing = false;
     private Vector2 BaseScale;
     private Vector2 BaseCol;
-    private GameObject LatestCheckpoint;
     private float Energy = 0f;
     private int CpIndex = 0;
 
@@ -47,8 +49,6 @@ public class SlimeController : MonoBehaviour {
     private bool UpInput => Keyboard.current.wKey.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame || Keyboard.current.upArrowKey.wasPressedThisFrame;
     private bool DownInput => Keyboard.current.sKey.wasPressedThisFrame || Keyboard.current.downArrowKey.wasPressedThisFrame;
 
-    private int AnimatingColor = 0;
-
     void Start() {
         rb = GetComponent<Rigidbody2D>();
         col = GetComponent<BoxCollider2D>();
@@ -57,11 +57,11 @@ public class SlimeController : MonoBehaviour {
         BaseScale = transform.localScale;
         BaseCol = col.size;
         AccelHist = new Queue<Vector2>(Enumerable.Repeat(Vector2.zero, SmoothingSamples));
-        PlayerPrefs.SetInt("CheckpointIndex", 1);
+        PlayerPrefs.SetInt("CheckpointIndex", cp);
         if (PlayerPrefs.HasKey("CheckpointIndex")) {
             CpIndex = PlayerPrefs.GetInt("CheckpointIndex");
-            LatestCheckpoint = GameObject.Find($"Checkpoint-{CpIndex}");
-            MoveToCheckpoint();
+            ParallaxScript.SetIndex(CpIndex, FindCheckpointTransform(CpIndex).y);
+            MoveToCheckpoint(CpIndex);
         }
         ChangeEnergy(60f);
     }
@@ -131,31 +131,38 @@ public class SlimeController : MonoBehaviour {
 
     private void OnTriggerEnter2D(Collider2D other) {
         if (other.CompareTag("Respawn")) {
-            LatestCheckpoint = other.gameObject;
-            int ind = int.Parse(LatestCheckpoint.transform.name.Split("-")[1]);
-            if (ind > CpIndex) {
-                CpIndex = ind;
+            GameObject touched = other.gameObject;
+            int ind = int.Parse(touched.transform.name.Split("-")[1]);
+            MoveToCheckpoint(ind);
+            CpIndex = ind;
+            if (ind > PlayerPrefs.GetInt("CheckpointIndex")) 
                 PlayerPrefs.SetInt("CheckpointIndex", CpIndex);
-                MoveToCheckpoint();
-            }
         }
         else if (other.CompareTag("ManaOrb")) {
             other.gameObject.SetActive(false);
         }
         else if (other.CompareTag("Kill")) {
             StartCoroutine(AnimateColor());
-            MoveToCheckpoint();
+            MoveToCheckpoint(CpIndex);
+        }
+        else if (other.CompareTag("Jump")) {
+            rb.linearVelocityY = 0f;
+            rb.AddForce(new Vector2(0f, PadForce), ForceMode2D.Impulse);
         }
     }
 
-    public void MoveToCheckpoint() {
-        if (LatestCheckpoint != null) {
-            transform.position = LatestCheckpoint.transform.position + Vector3.up * 6;
-        }
-        else {
-            transform.position = new Vector3(0, 0, 0);
-        }
+    private Vector3 FindCheckpointTransform(int ind) {
+        if (ind != 0)
+            return GameObject.Find($"Checkpoint-{ind}").transform.position + Vector3.up * 6f;
+        else
+            return new Vector3(0, 0, 0);
+    }
+
+    public void MoveToCheckpoint(int checkpoint) {
+        Vector3 trans = FindCheckpointTransform(checkpoint);
+        transform.position = trans;
         rb.linearVelocity = Vector2.zero;
+        ParallaxScript.SetIndex(checkpoint, trans.y);
 
         GameObject Folder = GameObject.Find($"LvOrbs-{CpIndex}");
         if (Folder == null) return;
@@ -180,13 +187,14 @@ public class SlimeController : MonoBehaviour {
 
     IEnumerator AnimateColor() {
         float elapsed = 0f;
-
-        while (elapsed < ColorLerpDuration / 2f) {
+        while (elapsed < ColorLerpDuration) {
             elapsed += Time.deltaTime; 
             sr.color = Color.Lerp(Color.white, Color.red, elapsed / ColorLerpDuration);
             yield return null;
         }
-        while (elapsed < ColorLerpDuration / 2f) {
+
+        elapsed = 0f;
+        while (elapsed < ColorLerpDuration) {
             elapsed += Time.deltaTime; 
             sr.color = Color.Lerp(Color.red, Color.white, elapsed / ColorLerpDuration);
             yield return null;

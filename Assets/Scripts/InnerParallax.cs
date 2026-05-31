@@ -2,12 +2,22 @@ using UnityEngine;
 
 public class InnerParallax : MonoBehaviour {
     public float ParallaxFactor;
-    public float StartY;
+    public Sprite[] Backgrounds;
+    private SpriteRenderer sr;
+    private float StartY;
+    void Start() {
+        sr = GetComponent<SpriteRenderer>();
+    }
     void LateUpdate() {
         transform.localPosition = new Vector3(
             0f,
-            StartY - (transform.parent.localPosition.y * ParallaxFactor),
+            Mathf.Min((transform.parent.localPosition.y - StartY) * -ParallaxFactor - 10f, -10f),
             transform.localPosition.z
         );
+    }
+
+    public void SetIndex(int index, float startY) {
+        StartY = startY;
+        sr.sprite = Backgrounds[index];
     }
 }

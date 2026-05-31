@@ -6,6 +6,7 @@ TagManager:
   tags:
   - ManaOrb
   - Kill
+  - Jump
   layers:
   - Default
   - TransparentFX
