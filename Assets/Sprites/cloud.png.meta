@@ -1,13 +1,10 @@
 fileFormatVersion: 2
-guid: fc9565a46e9d833778859a6a563b4b1f
+guid: a0ff03979c1788326a0da79a637c7f5d
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: 4334182692249300709
-    second: vines_0
-  - first:
-      213: 584458075429408047
-    second: vines_1
+      213: -6981827254641702772
+    second: cloud_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -53,7 +50,7 @@ TextureImporter:
   spriteExtrude: 1
   spriteMeshType: 1
   alignment: 7
-  spritePivot: {x: 0.5, y: 0}
+  spritePivot: {x: 0.5, y: 0.5}
   spritePixelsToUnits: 102.4
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
@@ -116,23 +113,23 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: vines_0
+      name: cloud_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 740
-        height: 2220
+        width: 1024
+        height: 3077
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       customData: 
       outline: []
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 5ee6a23f13c162c30800000000000000
-      internalID: 4334182692249300709
+      spriteID: c88c0fb6a119b1f90800000000000000
+      internalID: -6981827254641702772
       vertices: []
       indices: 
       edges: []
@@ -141,7 +138,7 @@ TextureImporter:
     customData: 
     physicsShape: []
     bones: []
-    spriteID: 4dd98b6afcdb1f1f2b25d27c374f5256
+    spriteID: 5e97eb03825dee720800000000000000
     internalID: 0
     vertices: []
     indices: 
@@ -149,11 +146,9 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     spriteCustomMetadata:
-      entries:
-      - key: SpriteEditor.SliceSettings
-        value: '{"sliceOnImport":false,"gridCellCount":{"x":1.0,"y":1.0},"gridSpriteSize":{"x":740.0,"y":2220.0},"gridSpriteOffset":{"x":0.0,"y":0.0},"gridSpritePadding":{"x":0.0,"y":0.0},"pivot":{"x":0.5,"y":0.5},"pivotPixels":{"x":0.0,"y":0.0},"autoSlicingMethod":0,"spriteAlignment":0,"pivotUnitMode":0,"slicingType":2,"keepEmptyRects":false,"isAlternate":false}'
+      entries: []
     nameFileIdTable:
-      vines_0: 4334182692249300709
+      cloud_0: -6981827254641702772
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

@@ -2,7 +2,9 @@ using UnityEngine;
 
 public class InnerParallax : MonoBehaviour {
     public float ParallaxFactor;
-    public Sprite[] Backgrounds;
+    public Sprite[] InnerBackgrounds;
+    public SpriteRenderer Outer;
+    public Sprite[] OuterBackgrounds;
     private SpriteRenderer sr;
     private float StartY;
     void Start() {
@@ -18,6 +20,7 @@ public class InnerParallax : MonoBehaviour {
 
     public void SetIndex(int index, float startY) {
         StartY = startY;
-        sr.sprite = Backgrounds[index];
+        sr.sprite = InnerBackgrounds[index];
+        Outer.sprite = OuterBackgrounds[index];
     }
 }

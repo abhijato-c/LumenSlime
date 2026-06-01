@@ -43,6 +43,7 @@
     <UnityVersion>6000.4.1f1</UnityVersion>
   </PropertyGroup>
   <ItemGroup>
+    <Analyzer Include="/home/abhijato/.vscode/extensions/visualstudiotoolsforunity.vstuc-1.2.2/Analyzers/Microsoft.Unity.Analyzers.dll" />
     <Analyzer Include="/run/media/Data/Unity Editor Debian/6000.4.1f1/Editor/Data/Tools/BuildPipeline/Unity.SourceGenerators/Unity.SourceGenerators.dll" />
     <Analyzer Include="/run/media/Data/Unity Editor Debian/6000.4.1f1/Editor/Data/Tools/BuildPipeline/Unity.SourceGenerators/Unity.Properties.SourceGenerator.dll" />
     <Analyzer Include="/run/media/Data/Unity Editor Debian/6000.4.1f1/Editor/Data/Tools/BuildPipeline/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll" />

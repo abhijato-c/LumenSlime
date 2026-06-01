@@ -3590,9 +3590,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::InnerParallax
   ParallaxFactor: 0.7
-  Backgrounds:
+  InnerBackgrounds:
   - {fileID: 21300000, guid: fc9565a46e9d833778859a6a563b4b1f, type: 3}
   - {fileID: 21300000, guid: 7989cdbe95b2f86d2aadb9e4f9a7383c, type: 3}
+  - {fileID: 21300000, guid: a0ff03979c1788326a0da79a637c7f5d, type: 3}
+  Outer: {fileID: 1721967851}
+  OuterBackgrounds:
+  - {fileID: 21300000, guid: 5d2d90d51686349dfaa16ed9a46223db, type: 3}
+  - {fileID: 21300000, guid: c3e1316d18efaef7da7747dfa02df2b4, type: 3}
+  - {fileID: 21300000, guid: da7c3850a6f25bd2ea8f623720bcca64, type: 3}
 --- !u!1 &1038801555
 GameObject:
   m_ObjectHideFlags: 0
@@ -4805,7 +4811,7 @@ SpriteRenderer:
   m_SortingLayer: 1
   m_SortingOrder: 0
   m_MaskInteraction: 0
-  m_Sprite: {fileID: -6243134052031417624, guid: 5d2d90d51686349dfaa16ed9a46223db, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5d2d90d51686349dfaa16ed9a46223db, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
