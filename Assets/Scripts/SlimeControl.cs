@@ -2,7 +2,6 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine.UI;
 using System.Collections;
 
 public class SlimeController : MonoBehaviour {
@@ -63,7 +62,6 @@ public class SlimeController : MonoBehaviour {
             ParallaxScript.SetIndex(CpIndex, FindCheckpointTransform(CpIndex).y);
             MoveToCheckpoint(CpIndex);
         }
-        ChangeEnergy(60f);
     }
 
     void Update() {
@@ -169,20 +167,6 @@ public class SlimeController : MonoBehaviour {
         for (int i = 0; i < Folder.transform.childCount; i++) {
             Folder.transform.GetChild(i).gameObject.SetActive(true);
         }
-    }
-
-    public void ChangeEnergy(float amount) {
-        Energy = Mathf.Clamp(Energy + amount, 0f, 100f);
-        float Mheight  = EnergyFill.GetComponentInParent<RectTransform>().sizeDelta.y;
-        EnergyFill.GetComponent<RectTransform>().sizeDelta = new Vector2(
-            EnergyFill.GetComponent<RectTransform>().sizeDelta.x, 
-            Energy / 100f * Mheight
-        );
-        EnergyFill.GetComponent<RectTransform>().anchoredPosition = new Vector2(
-            0f, 
-            Energy / 100f * Mheight / 2f
-        );
-        EnergyFill.GetComponent<Image>().color = Color.Lerp(Color.red, Color.green, Energy / 100f);
     }
 
     IEnumerator AnimateColor() {
