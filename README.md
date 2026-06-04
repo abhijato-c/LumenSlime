@@ -25,3 +25,9 @@ In LumenSlime, you control Squeak, a glowing, bouncy slime who has to reach the 
 ## Download & Play
 
 Download from [itch.io](https://m-8000.itch.io/lumenslime) to play!
+
+---
+
+## AI
+
+AI used for debugging physics movements, and as autocomplete.
