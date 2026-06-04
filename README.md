@@ -25,6 +25,19 @@ In LumenSlime, you control Squeak, a glowing, bouncy slime who has to reach the 
 ## Download & Play
 
 Download from [itch.io](https://m-8000.itch.io/lumenslime) to play!
+Builds available and tested for Linux and Windows.
+
+---
+
+## Technical
+
+This game was built completely in Unity. The main script for slime movement is controlled by physics, and uses forces and acceleration to move the slime. Because of this physics based approach, this game may feel shightly different from other platformers with the controls. PlayerPrefs class in Unity is used to store checkpoints persistently. The level design is done with tilemaps.
+
+---
+
+## Motivation
+
+I wanted to learn a bit of game design with a simple project, and basic animations like paralax and squish effects. This project didn't take too much effort or time, and I learnt the concepts of Unity that I wanted to.
 
 ---
 
