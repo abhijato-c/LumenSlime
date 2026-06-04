@@ -23,10 +23,9 @@ public class SlimeController : MonoBehaviour {
     public int SmoothingSamples;
 
     [Header("Misc")]
-    public GameObject EnergyFill;
+    public GameObject EndFrame;
     public float ColorLerpDuration;
     public InnerParallax ParallaxScript;
-    public int cp = 1;
 
     private Rigidbody2D rb;
     private BoxCollider2D col;
@@ -37,7 +36,6 @@ public class SlimeController : MonoBehaviour {
     private bool Downing = false;
     private Vector2 BaseScale;
     private Vector2 BaseCol;
-    private float Energy = 0f;
     private int CpIndex = 0;
 
     private Queue<Vector2> AccelHist;
@@ -56,7 +54,7 @@ public class SlimeController : MonoBehaviour {
         BaseScale = transform.localScale;
         BaseCol = col.size;
         AccelHist = new Queue<Vector2>(Enumerable.Repeat(Vector2.zero, SmoothingSamples));
-        PlayerPrefs.SetInt("CheckpointIndex", cp);
+        
         if (PlayerPrefs.HasKey("CheckpointIndex")) {
             CpIndex = PlayerPrefs.GetInt("CheckpointIndex");
             ParallaxScript.SetIndex(CpIndex, FindCheckpointTransform(CpIndex).y);
@@ -162,11 +160,8 @@ public class SlimeController : MonoBehaviour {
         rb.linearVelocity = Vector2.zero;
         ParallaxScript.SetIndex(checkpoint, trans.y);
 
-        GameObject Folder = GameObject.Find($"LvOrbs-{CpIndex}");
-        if (Folder == null) return;
-        for (int i = 0; i < Folder.transform.childCount; i++) {
-            Folder.transform.GetChild(i).gameObject.SetActive(true);
-        }
+        if (checkpoint == 5)
+            EndFrame.SetActive(true);
     }
 
     IEnumerator AnimateColor() {
