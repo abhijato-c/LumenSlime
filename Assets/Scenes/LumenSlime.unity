@@ -19424,7 +19424,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1038801558}
         m_TargetAssemblyTypeName: SlimeController, Assembly-CSharp
-        m_MethodName: MoveToCheckpoint
+        m_MethodName: respawn
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

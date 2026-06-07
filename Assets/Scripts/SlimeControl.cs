@@ -154,6 +154,10 @@ public class SlimeController : MonoBehaviour {
             return new Vector3(0, 0, 0);
     }
 
+    public void respawn() {
+        MoveToCheckpoint(CpIndex);
+    }
+
     public void MoveToCheckpoint(int checkpoint) {
         Vector3 trans = FindCheckpointTransform(checkpoint);
         transform.position = trans;
